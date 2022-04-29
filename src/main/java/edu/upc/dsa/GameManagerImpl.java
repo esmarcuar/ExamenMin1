@@ -1,114 +1,110 @@
 package edu.upc.dsa;
 
-import edu.upc.dsa.models.PuntoInteres;
-import edu.upc.dsa.models.User;
+import edu.upc.dsa.models.Compra;
+import edu.upc.dsa.models.Objeto;
+import edu.upc.dsa.models.Usuario;
 import org.apache.log4j.Logger;
 
 import java.util.*;
 
-public class GameManagerImpl implements GameManager{
+public class GameManagerImpl implements GameManager {
 
-    HashMap<String, User> listausers = new HashMap<String,User>();
-    List<PuntoInteres> listapuntosinteres = new LinkedList<>();
+    HashMap<String, String> listausuarios = new HashMap<String, String>();
+    List<Objeto> listaobjetos = new LinkedList<>();
+    Queue<Compra> cuaCompra= new LinkedList<Compra>();
     static final Logger logger = Logger.getLogger(GameManagerImpl.class.getName());
     private static GameManagerImpl manager;
 
     //Singleton
-    public static GameManagerImpl getInstance(){
-        if(manager==null){
-            manager=new GameManagerImpl();
+    public static GameManagerImpl getInstance() {
+        if (manager == null) {
+            manager = new GameManagerImpl();
         }
         return manager;
     }
-    public GameManagerImpl(){}
+
+    public GameManagerImpl() {
+    }
 
 
     @Override
-    public void addUser(String nom, String id, List<PuntoInteres> p) {
-        User user = new User(nom,id,p);
-        listausers.put(id,user);
-        logger.info("S'ha afegit un nou usuari: "+user.getNombre()+" "+user.getId()+" "+user.getPuntoInteresList());
+    public void addUsuario(String nombre, String apellidos, String fecha, String correo, String contraseña, String id, int saldo, List<Objeto> objetoUsuario) {
+        Usuario usuario = new Usuario(nombre, apellidos, fecha, correo, contraseña, id, saldo);
+        listausuarios.put(correo, contraseña);
+        logger.info("S'ha afegit un nou usuari: " + usuario.getNombre() + " " + usuario.getId() + " " + usuario.getApellidos() + " " + usuario.getFecha() + " " + usuario.getCorreo() + " " + usuario.getContraseña() + " " + usuario.getSaldo() + "" + usuario.getObjetoUsuario());
+
     }
 
     @Override
-    public List<User> listaUsersOrdenados() {
-        List<User> r = new LinkedList<>(listausers.values());
-        Collections.sort(r, new Comparator<User>() {
+    public List<Usuario> listaUsuariosOrdenados() {
+        List<Usuario> r = new LinkedList<>(listausuarios.values());
+        Collections.sort(r, new Comparator<Usuario>() {
             @Override
-            public int compare(User o1, User o2) {
-                return o1.getNombre().compareToIgnoreCase(o2.getNombre());
-            }
-        });
-        logger.info("Llista ordenada alfabeticament: "+r.toString());
+            public int compare(Usuario o1, Usuario o2) {
+                if (o1.getApellidos() != o2.getApellidos()) {
+                    return o1.getApellidos().compareToIgnoreCase(o2.getApellidos());
+                }
+            });
+        }
+        logger.info("Llista ordenada alfabeticament: "+r.toString())
+        );
         return r;
     }
-
     @Override
-    public User consultarUser(String name) {
-        User user = getUserByName(name);
-        logger.info("Nom: "+user.getNombre()+" ID: "+user.getId()+" Punto d'Interes: "+user.getPuntoInteresList());
-        return user;
+    public void addObjeto(Objeto objeto) {
+    this.listaobjetos.add(objeto);
     }
 
     @Override
-    public void addPuntoInteresToUser(String user, String pI) {
-        User u = getUserByName(user);
-        PuntoInteres punto = getPuntoInteresByName(pI);
-        List<PuntoInteres> lista = u.getPuntoInteresList();
-        if(u!=null){
-            logger.info("Usuari Trobat: "+user);
-            lista.add(punto);
-            punto.addUserToPuntoInteres(u);
-            u.setPuntoInteresList(lista);
-        }
-        logger.info("Usuari no Trobat");
-    }
+    public List<Objeto> listaObjetosOrdenados() {
+        List<Objeto> resultado = new LinkedList<>(this.listaobjetos);
 
-    @Override
-    public List<PuntoInteres> getlistaPuntoInteres(String user) {
-        List<PuntoInteres> lista = getlistaPuntoInteres(user);
-        return lista;
-    }
-
-    @Override
-    public List<User> getUsers(String pI) {
-        PuntoInteres puntoInteres = getPuntoInteresByName(pI);
-        return puntoInteres.getUserList();
-    }
-
-    @Override
-    public List<User> getUsersOrdenados() {
-        List<User> list = new LinkedList<>(listausers.values());
-        Collections.sort(list, new Comparator<User>() {
+        Collections.sort(resultado, new Comparator<Objeto>() {
             @Override
-            public int compare(User o1, User o2) {
-                return o1.getNumPuntos()-o2.getNumPuntos();
+            public int compare(Objeto p1, Objeto p2) {
+                return Integer.compare(p1.getCoins(), p2.getCoins());
             }
         });
-        logger.info("Llista usuaris ordenats per numero de punts d'interes: "+list.toString());
-        return list;
+        Collections.reverse(resultado);
+        logger.info("Lista de objetos ordenados por precio (descendente): " + resultado.toString());
+        return resultado;
+    }
+
+    @Override
+    public void realizarCompra(String UserId, Compra compra) {
+    compra.setUser(compra);
+    this.cuaCompra.add(compra);
+    }
+
+    @Override
+    public List<Usuario> listaObjetosUsuarios(String UsuarioId) {
+        Objeto objeto = getObjetoByName(UsuarioId);
+        return objeto.getListaUsuario();
     }
 
     @Override
     public void clear() {
-        listapuntosinteres.clear();
-        listausers.clear();
+        listaobjetos.clear();
+        listausuarios.clear();
     }
 
     @Override
-    public User getUserByName(String n) {
-        User user = this.listausers.get(n);
-        return user;
+    public String getUserByName(String nombre) {
+        String usuario = this.listausuarios.get(nombre);
+        return usuario;
     }
 
     @Override
-    public PuntoInteres getPuntoInteresByName(String pI) {
-        PuntoInteres pIt=null;
-        for(PuntoInteres puntoInteres: this.listapuntosinteres){
-            if(puntoInteres.getPunto().compareTo(pI)==0){
-                pIt=puntoInteres;
+    public Objeto getObjetoByName(String nombre) {
+        Objeto obt=null;
+        for(Objeto objeto: this.listaobjetos){
+            if(objeto.getNombre().compareTo(String.valueOf(obt))==0){
+                obt=objeto;
             }
         }
-        return pIt;
+        return obt;
+    }
     }
 }
+
+

@@ -1,30 +1,43 @@
 package edu.upc.dsa;
 
-import edu.upc.dsa.models.PuntoInteres;
-import edu.upc.dsa.models.User;
+import edu.upc.dsa.models.Compra;
+import edu.upc.dsa.models.Objeto;
+import edu.upc.dsa.models.Usuario;
 
 import java.util.List;
 
 public interface GameManager {
+    //Añadir usuario
+    public void addUsuario(String nombre, String apellidos, String fecha, String correo, String contraseña, String id, int saldo, List<Objeto> objetoUsuario);
 
-    public void addUser(String nom, String id, List<PuntoInteres> puntoInteres);
-    //Añadir un usuario
-    public List<User> listaUsersOrdenados();
     //Listado de usuarios ordenado alfabéticamente
-    public User consultarUser(String name);
-    //Consultar información de un usuario
-    public void addPuntoInteresToUser(String user, String pI);
-    //Informar que un usuario pasa por un punto de interés
-    public List<PuntoInteres> getlistaPuntoInteres(String user);
-    //Consultar los puntos de interés por los que un usuario pasa
-    public List<User> getUsers(String pI);
-    //Listado de usuarios que han pasado por un punto de interés
-    public List<User> getUsersOrdenados();
+    public List<Usuario> listaUsuariosOrdenados();
 
-    //Funcions Auxiliars
+    //Añadir nuevo Objeto
+    public void addObjeto(Objeto objeto);
+
+    //Listado de Objetos ordenado por precio
+    public List<Objeto> listaObjetosOrdenados();
+
+    //Compra de un objeto por un usuario
+    public void realizarCompra(String UsuarioId, Compra compra);
+
+
+    //Listado objetos coprados por un usuario
+    public List<Usuario> listaObjetosUsuarios(String UsuarioId);
+
+
+    //Funciones auxiliares
     public void clear();
-    public User getUserByName(String n);
-    public PuntoInteres getPuntoInteresByName(String pI);
 
+    public String getUserByName(String nombre);
 
+    public Objeto getObjetoByName(String nombre);
 }
+
+
+
+
+
+
+
